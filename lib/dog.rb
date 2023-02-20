@@ -36,10 +36,10 @@ class Dog
           VALUES (?, ?)
         SQL
     
-        # insert the song
+        # insert the dog
         DB[:conn].execute(sql, self.name, self.breed)
     
-        # get the song ID from the database and save it to the Ruby instance
+        # get the dog ID from the database and save it to the Ruby instance
         self.id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
     
         # return the Ruby instance
@@ -93,6 +93,20 @@ class Dog
 
         DB[:conn].execute(sql,id).map{|row| self.new_from_db(row)}.first
     end
+
+    def self.find_or_create_by(name:, breed:)
+        dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ?", name, breed)
+        if !dog.empty?
+            
+        else
+          dog = self.create(name: name, breed: breed)
+        end
+        dog
+    end
+    def update
+        sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
+        DB[:conn].execute(sql, self.name, self.breed, self.id)
+      end
 end
 
 
